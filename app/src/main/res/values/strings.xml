@@ -1,3 +1,9 @@
 <resources>
+
     <string name="app_name">SiMukmin</string>
+    <string name="empty_list">Belum ada setoran hafalan</string>
+    <string name="add_setoran">Tambah setoran</string>
+    <string name="label_surah">Surah: %1$s</string>
+    <string name="label_ayat">Ayat: %1$s</string>
+
 </resources>
