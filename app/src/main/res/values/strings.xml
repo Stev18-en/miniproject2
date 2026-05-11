@@ -5,5 +5,10 @@
     <string name="add_setoran">Tambah setoran</string>
     <string name="label_surah">Surah: %1$s</string>
     <string name="label_ayat">Ayat: %1$s</string>
+    <string name="detail_title">Detail Setoran</string>
+    <string name="input_nama">Nama Siswa</string>
+    <string name="input_surah">Nama Surah</string>
+    <string name="input_ayat">Ayat</string>
+    <string name="input_catatan">Catatan Guru</string>
 
 </resources>

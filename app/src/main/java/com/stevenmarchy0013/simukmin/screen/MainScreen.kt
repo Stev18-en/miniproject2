@@ -29,13 +29,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.stevenmarchy0013.simukmin.ui.theme.SiMukminTheme
 import com.stevenmarchy0013.simukmin.model.Setoran
 import com.stevenmarchy0013.simukmin.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -140,6 +142,8 @@ fun ListItem(setoran: Setoran, onClick: () -> Unit) {
 @Composable
 fun MainScreenPreview() {
     SiMukminTheme {
-        MainScreen()
+        MainScreen(
+            navController = rememberNavController()
+        )
     }
 }
