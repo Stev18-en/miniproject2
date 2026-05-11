@@ -5,7 +5,7 @@ import com.stevenmarchy0013.simukmin.model.Setoran
 
 class MainViewModel : ViewModel() {
 
-    val data = listOf(
+    var data = listOf(
 
         Setoran(
             1,

@@ -17,18 +17,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -43,7 +41,6 @@ fun MainScreen() {
                 )
             )
         }
-
     ) { innerPadding ->
 
         ScreenContent(
@@ -57,27 +54,36 @@ fun ScreenContent(modifier: Modifier = Modifier) {
     val viewModel: MainViewModel = viewModel()
     val data = viewModel.data
 
-    LazyColumn(
-        modifier = modifier.fillMaxSize()
-    ) {
-        items(data) {
-            ListItem(setoran = it)
-            HorizontalDivider()
+    if (data.isEmpty()) {
+        Column(
+            modifier = modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Belum ada setoran hafalan"
+            )
+        }
+    } else {
+        LazyColumn(
+            modifier = modifier.fillMaxSize()
+        ) {
+            items(data) {
+                ListItem(setoran = it)
+                HorizontalDivider()
+            }
         }
     }
 }
 
 @Composable
 fun ListItem(setoran: Setoran) {
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-
         Text(
             text = setoran.namaSiswa,
             fontWeight = FontWeight.Bold,
@@ -85,25 +91,21 @@ fun ListItem(setoran: Setoran) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-
         Text(
             text = "Surah: ${setoran.surah}",
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-
         Text(
             text = "Ayat: ${setoran.ayat}",
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-
         Text(
             text = setoran.catatan,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
-
         Text(
             text = setoran.tanggal,
             style = MaterialTheme.typography.bodySmall
