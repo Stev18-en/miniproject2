@@ -13,7 +13,44 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.stevenmarchy0013.simukmin.model.Setoran
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.ui.graphics.Color
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainScreen() {
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "SiMukmin",
+                        color = Color.White
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF2E7D32)
+                )
+            )
+        }
+
+    ) { innerPadding ->
+
+        ScreenContent(
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
+}
 @Composable
 fun ScreenContent(modifier: Modifier = Modifier) {
 
@@ -23,11 +60,8 @@ fun ScreenContent(modifier: Modifier = Modifier) {
     LazyColumn(
         modifier = modifier.fillMaxSize()
     ) {
-
         items(data) {
-
             ListItem(setoran = it)
-
             HorizontalDivider()
         }
     }
@@ -38,20 +72,41 @@ fun ListItem(setoran: Setoran) {
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(16.dp),
 
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
 
-        Text(text = setoran.namaSiswa)
+        Text(
+            text = setoran.namaSiswa,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.titleMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
 
-        Text(text = setoran.surah)
+        Text(
+            text = "Surah: ${setoran.surah}",
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
 
-        Text(text = "Ayat ${setoran.ayat}")
+        Text(
+            text = "Ayat: ${setoran.ayat}",
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
 
-        Text(text = setoran.tanggal)
+        Text(
+            text = setoran.catatan,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
 
-        Text(text = setoran.catatan)
+        Text(
+            text = setoran.tanggal,
+            style = MaterialTheme.typography.bodySmall
+        )
     }
 }
