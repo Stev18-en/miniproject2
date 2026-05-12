@@ -11,5 +11,8 @@
     <string name="input_ayat">Ayat</string>
     <string name="input_catatan">Catatan Guru</string>
     <string name="btn_simpan">Simpan</string>
+    <string name="error_nama">Nama siswa harus diisi</string>
+    <string name="error_surah">Nama surah harus diisi</string>
+    <string name="error_ayat">Ayat harus diisi</string>
 
 </resources>

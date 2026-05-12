@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.tooling.preview.Preview
@@ -76,6 +77,16 @@ fun FormSetoran(data: Setoran?, onSimpan:()-> Unit, modifier: Modifier = Modifie
     val catatan = remember {
         mutableStateOf(data?.catatan ?:"")
     }
+    val namaError = remember {
+        mutableStateOf(false)
+    }
+    val surahError = remember {
+        mutableStateOf(false)
+    }
+    val ayatError = remember {
+        mutableStateOf(false)
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -88,31 +99,57 @@ fun FormSetoran(data: Setoran?, onSimpan:()-> Unit, modifier: Modifier = Modifie
             onValueChange = {
                 namaSiswa.value = it
             },
+            isError = namaError.value,
+
             label = {
                 Text(text = stringResource(R.string.input_nama))
             },
             modifier = Modifier.fillMaxWidth()
         )
+        if (namaError.value) {
+
+            Text(
+                text = stringResource(R.string.error_nama),
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
         OutlinedTextField(
             value = surah.value,
             onValueChange = {
                 surah.value = it
             },
+            isError = surahError.value,
             label = {
                 Text(text = stringResource(R.string.input_surah))
             },
             modifier = Modifier.fillMaxWidth()
         )
+        if (surahError.value) {
+            Text(
+                text = stringResource(R.string.error_surah),
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
         OutlinedTextField(
             value = ayat.value,
             onValueChange = {
                 ayat.value = it
             },
+            isError = ayatError.value,
             label = {
                 Text(text = stringResource(R.string.input_ayat))
             },
             modifier = Modifier.fillMaxWidth()
         )
+        if (ayatError.value) {
+            Text(
+                text = stringResource(R.string.error_ayat),
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
         OutlinedTextField(
             value = catatan.value,
             onValueChange = {
@@ -125,7 +162,16 @@ fun FormSetoran(data: Setoran?, onSimpan:()-> Unit, modifier: Modifier = Modifie
         )
         Button(
             onClick = {
-                onSimpan()
+                namaError.value = namaSiswa.value.isBlank()
+                surahError.value = surah.value.isBlank()
+                ayatError.value = ayat.value.isBlank()
+                if (
+                    !namaError.value &&
+                    !surahError.value &&
+                    !ayatError.value
+                ) {
+                    onSimpan()
+                }
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
