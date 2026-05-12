@@ -10,5 +10,6 @@
     <string name="input_surah">Nama Surah</string>
     <string name="input_ayat">Ayat</string>
     <string name="input_catatan">Catatan Guru</string>
+    <string name="btn_simpan">Simpan</string>
 
 </resources>

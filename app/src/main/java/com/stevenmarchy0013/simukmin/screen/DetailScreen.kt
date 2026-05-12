@@ -18,15 +18,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.stevenmarchy0013.simukmin.R
+import com.stevenmarchy0013.simukmin.model.Setoran
 import com.stevenmarchy0013.simukmin.ui.theme.SiMukminTheme
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(navController: NavHostController, id: Long) {
+    val viewModel: MainViewModel = viewModel()
+    val data = viewModel.getSetoran(id)
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -44,25 +52,29 @@ fun DetailScreen(navController: NavHostController, id: Long) {
 
     ) { innerPadding ->
         FormSetoran(
+            data = data,
+            onSimpan = {
+                navController.popBackStack()
+            },
             modifier = Modifier.padding(innerPadding)
         )
     }
 }
 
 @Composable
-fun FormSetoran(modifier: Modifier = Modifier) {
+fun FormSetoran(data: Setoran?, onSimpan:()-> Unit, modifier: Modifier = Modifier) {
 
     val namaSiswa = remember {
-        mutableStateOf("")
+        mutableStateOf(data?.namaSiswa ?:"")
     }
     val surah = remember {
-        mutableStateOf("")
+        mutableStateOf(data?.surah ?:"")
     }
     val ayat = remember {
-        mutableStateOf("")
+        mutableStateOf(data?.ayat ?:"")
     }
     val catatan = remember {
-        mutableStateOf("")
+        mutableStateOf(data?.catatan ?:"")
     }
     Column(
         modifier = modifier
@@ -111,6 +123,19 @@ fun FormSetoran(modifier: Modifier = Modifier) {
             },
             modifier = Modifier.fillMaxWidth()
         )
+        Button(
+            onClick = {
+                onSimpan()
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF2E7D32)
+            )
+        ) {
+            Text(
+                text = stringResource(R.string.btn_simpan)
+            )
+        }
     }
 }
 @Preview(showBackground = true)

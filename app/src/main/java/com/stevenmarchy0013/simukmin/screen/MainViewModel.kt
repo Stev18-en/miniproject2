@@ -62,4 +62,9 @@ class MainViewModel : ViewModel() {
         )
 
     )
+    fun getSetoran(id: Long): Setoran? {
+        return data.find {
+            it.id == id
+        }
+    }
 }
