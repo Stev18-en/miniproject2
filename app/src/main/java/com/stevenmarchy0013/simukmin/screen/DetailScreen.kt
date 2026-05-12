@@ -26,7 +26,7 @@ import com.stevenmarchy0013.simukmin.ui.theme.SiMukminTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(navController: NavHostController) {
+fun DetailScreen(navController: NavHostController, id: Long) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -118,7 +118,8 @@ fun FormSetoran(modifier: Modifier = Modifier) {
 fun DetailScreenPreview() {
     SiMukminTheme {
         DetailScreen(
-            navController = rememberNavController()
+            navController = rememberNavController(),
+            id = -1
         )
     }
 }

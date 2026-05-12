@@ -34,6 +34,7 @@ import androidx.navigation.compose.rememberNavController
 import com.stevenmarchy0013.simukmin.ui.theme.SiMukminTheme
 import com.stevenmarchy0013.simukmin.model.Setoran
 import com.stevenmarchy0013.simukmin.R
+import com.stevenmarchy0013.simukmin.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,7 +56,7 @@ fun MainScreen(navController: NavHostController) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-
+                    navController.navigate(Screen.Detail.createRoute(-1))
                 }
             ) {
                 Icon(
@@ -68,12 +69,13 @@ fun MainScreen(navController: NavHostController) {
     ) { innerPadding ->
 
         ScreenContent(
+            navController = navController,
             modifier = Modifier.padding(innerPadding)
         )
     }
 }
 @Composable
-fun ScreenContent(modifier: Modifier = Modifier) {
+fun ScreenContent(navController: NavHostController, modifier: Modifier = Modifier) {
 
     val viewModel: MainViewModel = viewModel()
     val data = viewModel.data
@@ -93,7 +95,10 @@ fun ScreenContent(modifier: Modifier = Modifier) {
             modifier = modifier.fillMaxSize()
         ) {
             items(data) {
-                ListItem(setoran = it,onClick = { })
+                ListItem(setoran = it,
+                    onClick = {
+                        navController.navigate(Screen.Detail.createRoute(it.id))
+                } )
                 HorizontalDivider()
             }
         }
