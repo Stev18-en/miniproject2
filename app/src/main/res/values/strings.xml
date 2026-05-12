@@ -15,4 +15,5 @@
     <string name="error_surah">Nama surah harus diisi</string>
     <string name="error_ayat">Ayat harus diisi</string>
     <string name="invalid">Data setoran tidak boleh kosong</string>
+    <string name="btn_hapus">Hapus</string>
 </resources>

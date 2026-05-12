@@ -9,13 +9,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -46,22 +46,40 @@ fun DetailScreen(
     val viewModel: DetailViewModel =
         viewModel(factory = factory)
 
-    val data = viewModel.getSetoran(id)
+    val data = remember {
+        mutableStateOf<Setoran?>(null)
+    }
 
     val namaSiswa = remember {
-        mutableStateOf(data?.namaSiswa ?: "")
+        mutableStateOf("")
     }
 
     val surah = remember {
-        mutableStateOf(data?.surah ?: "")
+        mutableStateOf("")
     }
 
     val ayat = remember {
-        mutableStateOf(data?.ayat ?: "")
+        mutableStateOf("")
     }
 
     val catatan = remember {
-        mutableStateOf(data?.catatan ?: "")
+        mutableStateOf("")
+    }
+
+    LaunchedEffect(id) {
+
+        if (id != -1L) {
+
+            val setoran = viewModel.getSetoran(id)
+
+            setoran?.let {
+
+                namaSiswa.value = it.namaSiswa
+                surah.value = it.surah
+                ayat.value = it.ayat
+                catatan.value = it.catatan
+            }
+        }
     }
 
     Scaffold(
@@ -82,6 +100,7 @@ fun DetailScreen(
     ) { innerPadding ->
 
         FormSetoran(
+
             namaSiswa = namaSiswa.value,
             onNamaSiswaChange = {
                 namaSiswa.value = it
@@ -115,13 +134,21 @@ fun DetailScreen(
                         R.string.invalid,
                         Toast.LENGTH_LONG
                     ).show()
-
                     return@FormSetoran
                 }
-
                 if (id == -1L) {
 
                     viewModel.insert(
+                        namaSiswa = namaSiswa.value,
+                        surah = surah.value,
+                        ayat = ayat.value,
+                        catatan = catatan.value
+                    )
+
+                } else {
+
+                    viewModel.update(
+                        id = id,
                         namaSiswa = namaSiswa.value,
                         surah = surah.value,
                         ayat = ayat.value,
@@ -132,6 +159,15 @@ fun DetailScreen(
                 navController.popBackStack()
             },
 
+            onHapus = {
+
+                viewModel.delete(id)
+
+                navController.popBackStack()
+            },
+
+            isEdit = id != -1L,
+
             modifier = Modifier.padding(innerPadding)
         )
     }
@@ -139,6 +175,7 @@ fun DetailScreen(
 
 @Composable
 fun FormSetoran(
+
     namaSiswa: String,
     onNamaSiswaChange: (String) -> Unit,
 
@@ -152,6 +189,10 @@ fun FormSetoran(
     onCatatanChange: (String) -> Unit,
 
     onSimpan: () -> Unit,
+
+    onHapus: () -> Unit,
+
+    isEdit: Boolean,
 
     modifier: Modifier = Modifier
 ) {
@@ -221,6 +262,24 @@ fun FormSetoran(
             Text(
                 text = stringResource(R.string.btn_simpan)
             )
+        }
+
+        if (isEdit) {
+
+            Button(
+                onClick = onHapus,
+
+                modifier = Modifier.fillMaxWidth(),
+
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Red
+                )
+            ) {
+
+                Text(
+                    text = stringResource(R.string.btn_hapus)
+                )
+            }
         }
     }
 }

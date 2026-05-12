@@ -36,8 +36,36 @@ class DetailViewModel(
             dao.insert(setoran)
         }
     }
-    fun getSetoran(id: Long): Setoran? {
 
-        return null
+    fun update(
+        id: Long,
+        namaSiswa: String,
+        surah: String,
+        ayat: String,
+        catatan: String
+    ) {
+        val setoran = Setoran(
+            id = id,
+            tanggal = formatter.format(Date()),
+            namaSiswa = namaSiswa,
+            surah = surah,
+            ayat = ayat,
+            catatan = catatan
+        )
+        viewModelScope.launch(Dispatchers.IO) {
+            dao.update(setoran)
+        }
+    }
+    suspend fun getSetoran(id: Long): Setoran? {
+
+        return dao.getSetoranById(id)
+    }
+
+    fun delete(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            dao.getSetoranById(id)?.let {
+                dao.delete(it)
+            }
+        }
     }
 }

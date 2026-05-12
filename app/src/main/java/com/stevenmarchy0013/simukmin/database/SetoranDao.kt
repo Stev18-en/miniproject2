@@ -25,4 +25,5 @@ interface SetoranDao {
 
     @Query("SELECT * FROM setoran WHERE id = :id")
     suspend fun getSetoranById(id: Long): Setoran?
+
 }
