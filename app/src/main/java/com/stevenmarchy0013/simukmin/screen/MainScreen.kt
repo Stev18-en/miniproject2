@@ -28,6 +28,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.clickable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -35,6 +36,13 @@ import com.stevenmarchy0013.simukmin.ui.theme.SiMukminTheme
 import com.stevenmarchy0013.simukmin.model.Setoran
 import com.stevenmarchy0013.simukmin.R
 import com.stevenmarchy0013.simukmin.navigation.Screen
+import androidx.compose.ui.platform.LocalContext
+import com.stevenmarchy0013.simukmin.util.ViewModelFactory
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
+import com.stevenmarchy0013.simukmin.screen.MainViewModel
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,10 +85,14 @@ fun MainScreen(navController: NavHostController) {
 @Composable
 fun ScreenContent(navController: NavHostController, modifier: Modifier = Modifier) {
 
-    val viewModel: MainViewModel = viewModel()
-    val data = viewModel.data
+    val context = LocalContext.current
+    val factory = ViewModelFactory(context)
+    val viewModel: MainViewModel =
+        viewModel(factory = factory)
+    val data = viewModel.data.collectAsState()
 
-    if (data.isEmpty()) {
+
+    if (data.value.isEmpty()) {
         Column(
             modifier = modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
@@ -94,7 +106,7 @@ fun ScreenContent(navController: NavHostController, modifier: Modifier = Modifie
         LazyColumn(
             modifier = modifier.fillMaxSize()
         ) {
-            items(data) {
+            items(data.value) {
                 ListItem(setoran = it,
                     onClick = {
                         navController.navigate(Screen.Detail.createRoute(it.id))

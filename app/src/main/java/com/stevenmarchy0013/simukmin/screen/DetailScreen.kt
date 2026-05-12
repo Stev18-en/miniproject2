@@ -1,11 +1,15 @@
 package com.stevenmarchy0013.simukmin.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -16,25 +20,49 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.stevenmarchy0013.simukmin.R
 import com.stevenmarchy0013.simukmin.model.Setoran
 import com.stevenmarchy0013.simukmin.ui.theme.SiMukminTheme
-
+import com.stevenmarchy0013.simukmin.util.ViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(navController: NavHostController, id: Long) {
-    val viewModel: MainViewModel = viewModel()
+fun DetailScreen(
+    navController: NavHostController,
+    id: Long
+) {
+
+    val context = LocalContext.current
+
+    val factory = ViewModelFactory(context)
+
+    val viewModel: DetailViewModel =
+        viewModel(factory = factory)
+
     val data = viewModel.getSetoran(id)
+
+    val namaSiswa = remember {
+        mutableStateOf(data?.namaSiswa ?: "")
+    }
+
+    val surah = remember {
+        mutableStateOf(data?.surah ?: "")
+    }
+
+    val ayat = remember {
+        mutableStateOf(data?.ayat ?: "")
+    }
+
+    val catatan = remember {
+        mutableStateOf(data?.catatan ?: "")
+    }
 
     Scaffold(
         topBar = {
@@ -52,40 +80,81 @@ fun DetailScreen(navController: NavHostController, id: Long) {
         }
 
     ) { innerPadding ->
+
         FormSetoran(
-            data = data,
+            namaSiswa = namaSiswa.value,
+            onNamaSiswaChange = {
+                namaSiswa.value = it
+            },
+
+            surah = surah.value,
+            onSurahChange = {
+                surah.value = it
+            },
+
+            ayat = ayat.value,
+            onAyatChange = {
+                ayat.value = it
+            },
+
+            catatan = catatan.value,
+            onCatatanChange = {
+                catatan.value = it
+            },
+
             onSimpan = {
+
+                if (
+                    namaSiswa.value == "" ||
+                    surah.value == "" ||
+                    ayat.value == ""
+                ) {
+
+                    Toast.makeText(
+                        context,
+                        R.string.invalid,
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    return@FormSetoran
+                }
+
+                if (id == -1L) {
+
+                    viewModel.insert(
+                        namaSiswa = namaSiswa.value,
+                        surah = surah.value,
+                        ayat = ayat.value,
+                        catatan = catatan.value
+                    )
+                }
+
                 navController.popBackStack()
             },
+
             modifier = Modifier.padding(innerPadding)
         )
     }
 }
 
 @Composable
-fun FormSetoran(data: Setoran?, onSimpan:()-> Unit, modifier: Modifier = Modifier) {
+fun FormSetoran(
+    namaSiswa: String,
+    onNamaSiswaChange: (String) -> Unit,
 
-    val namaSiswa = remember {
-        mutableStateOf(data?.namaSiswa ?:"")
-    }
-    val surah = remember {
-        mutableStateOf(data?.surah ?:"")
-    }
-    val ayat = remember {
-        mutableStateOf(data?.ayat ?:"")
-    }
-    val catatan = remember {
-        mutableStateOf(data?.catatan ?:"")
-    }
-    val namaError = remember {
-        mutableStateOf(false)
-    }
-    val surahError = remember {
-        mutableStateOf(false)
-    }
-    val ayatError = remember {
-        mutableStateOf(false)
-    }
+    surah: String,
+    onSurahChange: (String) -> Unit,
+
+    ayat: String,
+    onAyatChange: (String) -> Unit,
+
+    catatan: String,
+    onCatatanChange: (String) -> Unit,
+
+    onSimpan: () -> Unit,
+
+    modifier: Modifier = Modifier
+) {
 
     Column(
         modifier = modifier
@@ -94,100 +163,74 @@ fun FormSetoran(data: Setoran?, onSimpan:()-> Unit, modifier: Modifier = Modifie
 
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+
         OutlinedTextField(
-            value = namaSiswa.value,
-            onValueChange = {
-                namaSiswa.value = it
-            },
-            isError = namaError.value,
+            value = namaSiswa,
+            onValueChange = onNamaSiswaChange,
 
             label = {
                 Text(text = stringResource(R.string.input_nama))
             },
+
             modifier = Modifier.fillMaxWidth()
         )
-        if (namaError.value) {
 
-            Text(
-                text = stringResource(R.string.error_nama),
-                color = Color.Red,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
         OutlinedTextField(
-            value = surah.value,
-            onValueChange = {
-                surah.value = it
-            },
-            isError = surahError.value,
+            value = surah,
+            onValueChange = onSurahChange,
+
             label = {
                 Text(text = stringResource(R.string.input_surah))
             },
+
             modifier = Modifier.fillMaxWidth()
         )
-        if (surahError.value) {
-            Text(
-                text = stringResource(R.string.error_surah),
-                color = Color.Red,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
+
         OutlinedTextField(
-            value = ayat.value,
-            onValueChange = {
-                ayat.value = it
-            },
-            isError = ayatError.value,
+            value = ayat,
+            onValueChange = onAyatChange,
+
             label = {
                 Text(text = stringResource(R.string.input_ayat))
             },
+
             modifier = Modifier.fillMaxWidth()
         )
-        if (ayatError.value) {
-            Text(
-                text = stringResource(R.string.error_ayat),
-                color = Color.Red,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
+
         OutlinedTextField(
-            value = catatan.value,
-            onValueChange = {
-                catatan.value = it
-            },
+            value = catatan,
+            onValueChange = onCatatanChange,
+
             label = {
                 Text(text = stringResource(R.string.input_catatan))
             },
+
             modifier = Modifier.fillMaxWidth()
         )
+
         Button(
-            onClick = {
-                namaError.value = namaSiswa.value.isBlank()
-                surahError.value = surah.value.isBlank()
-                ayatError.value = ayat.value.isBlank()
-                if (
-                    !namaError.value &&
-                    !surahError.value &&
-                    !ayatError.value
-                ) {
-                    onSimpan()
-                }
-            },
+            onClick = onSimpan,
+
             modifier = Modifier.fillMaxWidth(),
+
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF2E7D32)
             )
         ) {
+
             Text(
                 text = stringResource(R.string.btn_simpan)
             )
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun DetailScreenPreview() {
+
     SiMukminTheme {
+
         DetailScreen(
             navController = rememberNavController(),
             id = -1
