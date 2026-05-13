@@ -1,74 +1,76 @@
 package com.stevenmarchy0013.simukmin.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.res.stringResource
+import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.filled.ViewList
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.clickable
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.material3.Card
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.stevenmarchy0013.simukmin.ui.theme.SiMukminTheme
-import com.stevenmarchy0013.simukmin.model.Setoran
 import com.stevenmarchy0013.simukmin.R
+import com.stevenmarchy0013.simukmin.model.Setoran
 import com.stevenmarchy0013.simukmin.navigation.Screen
-import androidx.compose.ui.platform.LocalContext
+import com.stevenmarchy0013.simukmin.ui.theme.SiMukminTheme
 import com.stevenmarchy0013.simukmin.util.ViewModelFactory
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.platform.LocalContext
-import com.stevenmarchy0013.simukmin.screen.MainViewModel
 
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavHostController) {
+fun MainScreen(
+    navController: NavHostController
+) {
+
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.app_name),
-                        color = Color.White
+
+        floatingActionButton = {
+
+            FloatingActionButton(
+
+                onClick = {
+                    navController.navigate(
+                        Screen.Detail.createRoute(-1)
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF2E7D32)
-                )
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    navController.navigate(Screen.Detail.createRoute(-1))
-                },
+
                 containerColor = Color(0xFF2E7D32),
+
                 contentColor = Color.White
             ) {
+
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = stringResource(R.string.add_setoran)
@@ -84,43 +86,158 @@ fun MainScreen(navController: NavHostController) {
         )
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScreenContent(navController: NavHostController, modifier: Modifier = Modifier) {
+fun ScreenContent(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
 
     val context = LocalContext.current
+
     val factory = ViewModelFactory(context)
+
     val viewModel: MainViewModel =
         viewModel(factory = factory)
+
     val data = viewModel.data.collectAsState()
 
+    val isList = remember {
+        mutableStateOf(true)
+    }
 
-    if (data.value.isEmpty()) {
-        Column(
-            modifier = modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = stringResource(R.string.empty_list)
+    Scaffold(
+
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.app_name),
+                        color = Color.White
+                    )
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            isList.value = !isList.value
+                        }
+                    ) {
+
+                        Icon(
+
+                            imageVector =
+                                if (isList.value)
+                                    Icons.Default.GridView
+                                else
+                                    Icons.Default.ViewList,
+
+                            contentDescription = null,
+
+                            tint = Color.White
+                        )
+                    }
+                },
+
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF2E7D32)
+                )
             )
         }
-    } else {
-        LazyColumn(
-            modifier = modifier.fillMaxSize()
-        ) {
-            items(data.value) {
-                ListItem(setoran = it,
-                    onClick = {
-                        navController.navigate(Screen.Detail.createRoute(it.id))
-                } )
-                HorizontalDivider()
+
+    ) { padding ->
+
+        if (data.value.isEmpty()) {
+
+            Column(
+
+                modifier = modifier
+                    .padding(padding)
+                    .fillMaxSize(),
+
+                verticalArrangement = Arrangement.Center,
+
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Text(
+                    text = stringResource(R.string.empty_list)
+                )
+            }
+
+        } else {
+
+            if (isList.value) {
+
+                LazyColumn(
+
+                    modifier = modifier
+                        .padding(padding)
+                        .fillMaxSize()
+                ) {
+
+                    items(data.value) {
+
+                        ListItem(
+
+                            setoran = it,
+
+                            onClick = {
+
+                                navController.navigate(
+                                    Screen.Detail.createRoute(it.id)
+                                )
+                            }
+                        )
+
+                        HorizontalDivider()
+                    }
+                }
+
+            } else {
+
+                Column(
+
+                    modifier = modifier
+                        .padding(padding)
+                        .fillMaxSize(),
+
+                    verticalArrangement = Arrangement.Center,
+
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    LazyVerticalStaggeredGrid(
+
+                        columns = StaggeredGridCells.Fixed(2),
+
+                        modifier = modifier
+                            .padding(padding)
+                            .fillMaxSize()
+                    ) {
+                        items(data.value) {
+                            GridItem(
+                                setoran = it,
+                                onClick = {
+                                    navController.navigate(
+                                        Screen.Detail.createRoute(it.id)
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun ListItem(setoran: Setoran, onClick: () -> Unit) {
+fun ListItem(
+    setoran: Setoran,
+    onClick: () -> Unit
+) {
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -136,12 +253,18 @@ fun ListItem(setoran: Setoran, onClick: () -> Unit) {
             overflow = TextOverflow.Ellipsis
         )
         Text(
-            text = stringResource(R.string.label_surah,setoran.surah),
+            text = stringResource(
+                R.string.label_surah,
+                setoran.surah
+            ),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
         Text(
-            text = stringResource(R.string.label_ayat,setoran.ayat),
+            text = stringResource(
+                R.string.label_ayat,
+                setoran.ayat
+            ),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -154,6 +277,63 @@ fun ListItem(setoran: Setoran, onClick: () -> Unit) {
             text = setoran.tanggal,
             style = MaterialTheme.typography.bodySmall
         )
+    }
+}
+@Composable
+fun GridItem(
+    setoran: Setoran,
+    onClick: () -> Unit
+) {
+
+    Card(
+
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+            .clickable { onClick() }
+
+    ) {
+
+        Column(
+
+            modifier = Modifier.padding(16.dp),
+
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            Text(
+
+                text = setoran.namaSiswa,
+
+                fontWeight = FontWeight.Bold,
+
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Text(
+                text = stringResource(
+                    R.string.label_surah,
+                    setoran.surah
+                )
+            )
+
+            Text(
+                text = stringResource(
+                    R.string.label_ayat,
+                    setoran.ayat
+                )
+            )
+
+            Text(
+                text = setoran.catatan
+            )
+
+            Text(
+                text = setoran.tanggal,
+
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
     }
 }
 
