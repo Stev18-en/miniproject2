@@ -8,10 +8,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.ViewList
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -24,8 +28,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,10 +37,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.material3.Card
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -46,8 +45,9 @@ import com.stevenmarchy0013.simukmin.R
 import com.stevenmarchy0013.simukmin.model.Setoran
 import com.stevenmarchy0013.simukmin.navigation.Screen
 import com.stevenmarchy0013.simukmin.ui.theme.SiMukminTheme
+import com.stevenmarchy0013.simukmin.util.SettingsDataStore
 import com.stevenmarchy0013.simukmin.util.ViewModelFactory
-
+import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(
@@ -103,24 +103,40 @@ fun ScreenContent(
 
     val data = viewModel.data.collectAsState()
 
-    val isList = remember {
-        mutableStateOf(true)
-    }
+    val dataStore = SettingsDataStore(context)
+
+    val isList = dataStore.layoutFlow.collectAsState(
+        initial = true
+    )
+
+    val scope = rememberCoroutineScope()
 
     Scaffold(
 
         topBar = {
+
             TopAppBar(
+
                 title = {
+
                     Text(
                         text = stringResource(R.string.app_name),
                         color = Color.White
                     )
                 },
+
                 actions = {
+
                     IconButton(
+
                         onClick = {
-                            isList.value = !isList.value
+
+                            scope.launch {
+
+                                dataStore.saveLayout(
+                                    !isList.value
+                                )
+                            }
                         }
                     ) {
 
@@ -196,35 +212,29 @@ fun ScreenContent(
 
             } else {
 
-                Column(
+                LazyVerticalStaggeredGrid(
+
+                    columns = StaggeredGridCells.Fixed(2),
 
                     modifier = modifier
                         .padding(padding)
-                        .fillMaxSize(),
+                        .fillMaxSize()
 
-                    verticalArrangement = Arrangement.Center,
-
-                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    LazyVerticalStaggeredGrid(
+                    items(data.value) {
 
-                        columns = StaggeredGridCells.Fixed(2),
+                        GridItem(
 
-                        modifier = modifier
-                            .padding(padding)
-                            .fillMaxSize()
-                    ) {
-                        items(data.value) {
-                            GridItem(
-                                setoran = it,
-                                onClick = {
-                                    navController.navigate(
-                                        Screen.Detail.createRoute(it.id)
-                                    )
-                                }
-                            )
-                        }
+                            setoran = it,
+
+                            onClick = {
+
+                                navController.navigate(
+                                    Screen.Detail.createRoute(it.id)
+                                )
+                            }
+                        )
                     }
                 }
             }
@@ -239,46 +249,65 @@ fun ListItem(
 ) {
 
     Column(
+
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
             .padding(16.dp),
+
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+
         Text(
             text = setoran.namaSiswa,
+
             fontWeight = FontWeight.Bold,
+
             style = MaterialTheme.typography.titleMedium,
+
             maxLines = 1,
+
             overflow = TextOverflow.Ellipsis
         )
+
         Text(
             text = stringResource(
                 R.string.label_surah,
                 setoran.surah
             ),
+
             maxLines = 1,
+
             overflow = TextOverflow.Ellipsis
         )
+
         Text(
             text = stringResource(
                 R.string.label_ayat,
                 setoran.ayat
             ),
+
             maxLines = 1,
+
             overflow = TextOverflow.Ellipsis
         )
+
         Text(
             text = setoran.catatan,
+
             maxLines = 2,
+
             overflow = TextOverflow.Ellipsis
         )
+
         Text(
             text = setoran.tanggal,
+
             style = MaterialTheme.typography.bodySmall
         )
     }
 }
+
 @Composable
 fun GridItem(
     setoran: Setoran,
@@ -340,7 +369,9 @@ fun GridItem(
 @Preview(showBackground = true)
 @Composable
 fun MainScreenPreview() {
+
     SiMukminTheme {
+
         MainScreen(
             navController = rememberNavController()
         )
