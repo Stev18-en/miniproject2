@@ -16,4 +16,7 @@
     <string name="error_ayat">Ayat harus diisi</string>
     <string name="invalid">Data setoran tidak boleh kosong</string>
     <string name="btn_hapus">Hapus</string>
+    <string name="pesan_hapus">Hapus setoran ini?</string>
+    <string name="tombol_hapus">Hapus</string>
+    <string name="tombol_batal">Batal</string>
 </resources>

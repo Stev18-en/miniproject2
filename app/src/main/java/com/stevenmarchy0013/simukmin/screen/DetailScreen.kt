@@ -46,10 +46,6 @@ fun DetailScreen(
     val viewModel: DetailViewModel =
         viewModel(factory = factory)
 
-    val data = remember {
-        mutableStateOf<Setoran?>(null)
-    }
-
     val namaSiswa = remember {
         mutableStateOf("")
     }
@@ -64,6 +60,9 @@ fun DetailScreen(
 
     val catatan = remember {
         mutableStateOf("")
+    }
+    val showDialog = remember {
+        mutableStateOf(false)
     }
 
     LaunchedEffect(id) {
@@ -161,15 +160,29 @@ fun DetailScreen(
 
             onHapus = {
 
-                viewModel.delete(id)
-
-                navController.popBackStack()
+                showDialog.value = true
             },
 
             isEdit = id != -1L,
 
             modifier = Modifier.padding(innerPadding)
         )
+        if (id != -1L && showDialog.value) {
+
+            DisplayAlertDialog(
+
+                onDismissRequest = {
+
+                    showDialog.value = false
+                },
+
+                onConfirmation = {
+                    showDialog.value = false
+                    viewModel.delete(id)
+                    navController.popBackStack()
+                }
+            )
+        }
     }
 }
 
