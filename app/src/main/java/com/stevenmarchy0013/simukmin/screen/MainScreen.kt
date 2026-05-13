@@ -32,11 +32,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -101,7 +99,9 @@ fun ScreenContent(
     val isList = dataStore.layoutFlow.collectAsState(initial = true)
 
     val scope = rememberCoroutineScope()
-    var showThemeDialog by remember { mutableStateOf(false) }
+    val showThemeDialog = remember {
+        mutableStateOf(false)
+    }
 
     Scaffold(
         topBar = {
@@ -125,19 +125,19 @@ fun ScreenContent(
                                     Icons.Default.GridView
                                 else
                                     Icons.Default.ViewList,
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.change_layout),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
 
                     IconButton(
                         onClick = {
-                            showThemeDialog = true
+                            showThemeDialog.value = true
                         }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Palette,
-                            contentDescription = "Pilih Tema",
+                            contentDescription = stringResource(R.string.choose_theme),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
@@ -149,7 +149,7 @@ fun ScreenContent(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Recycle Bin",
+                            contentDescription = stringResource(R.string.recycle_bin),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
@@ -217,13 +217,15 @@ fun ScreenContent(
         }
     }
 
-    if (showThemeDialog) {
+    if (showThemeDialog.value) {
         AlertDialog(
             onDismissRequest = {
-                showThemeDialog = false
+                showThemeDialog.value = false
             },
             title = {
-                Text(text = "Pilih Tema")
+                Text(
+                    text = stringResource(R.string.choose_theme_title)
+                )
             },
             text = {
                 Column {
@@ -232,10 +234,12 @@ fun ScreenContent(
                             scope.launch {
                                 dataStore.saveTheme(0)
                             }
-                            showThemeDialog = false
+                            showThemeDialog.value = false
                         }
                     ) {
-                        Text("Hijau")
+                        Text(
+                            text = stringResource(R.string.theme_green)
+                        )
                     }
 
                     TextButton(
@@ -243,10 +247,12 @@ fun ScreenContent(
                             scope.launch {
                                 dataStore.saveTheme(1)
                             }
-                            showThemeDialog = false
+                            showThemeDialog.value = false
                         }
                     ) {
-                        Text("Biru")
+                        Text(
+                            text = stringResource(R.string.theme_blue)
+                        )
                     }
 
                     TextButton(
@@ -254,10 +260,12 @@ fun ScreenContent(
                             scope.launch {
                                 dataStore.saveTheme(2)
                             }
-                            showThemeDialog = false
+                            showThemeDialog.value = false
                         }
                     ) {
-                        Text("Ungu")
+                        Text(
+                            text = stringResource(R.string.theme_purple)
+                        )
                     }
 
                     TextButton(
@@ -265,10 +273,12 @@ fun ScreenContent(
                             scope.launch {
                                 dataStore.saveTheme(3)
                             }
-                            showThemeDialog = false
+                            showThemeDialog.value = false
                         }
                     ) {
-                        Text("Oranye")
+                        Text(
+                            text = stringResource(R.string.theme_orange)
+                        )
                     }
                 }
             },
@@ -318,7 +328,10 @@ fun ListItem(
 
         if (setoran.catatan.isNotBlank()) {
             Text(
-                text = setoran.catatan,
+                text = stringResource(
+                    R.string.label_catatan,
+                    setoran.catatan
+                ),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -363,13 +376,15 @@ fun GridItem(
 
             if (setoran.catatan.isNotBlank()) {
                 Text(
-                    text = setoran.catatan
+                    text = stringResource(
+                        R.string.label_catatan,
+                        setoran.catatan
+                    )
                 )
             }
         }
     }
 }
-
 @Preview(showBackground = true)
 @Composable
 fun MainScreenPreview() {

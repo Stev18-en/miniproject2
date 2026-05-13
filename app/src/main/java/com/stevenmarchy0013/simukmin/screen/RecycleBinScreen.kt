@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,10 +20,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -46,11 +52,17 @@ fun RecycleBinScreen(
 
     val data = viewModel.data.collectAsState(initial = emptyList())
 
+    var showClearDialog by remember {
+        mutableStateOf(false)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "Recycle Bin")
+                    Text(
+                        text = stringResource(R.string.recycle_bin)
+                    )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -68,7 +80,9 @@ fun RecycleBinScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Recycle Bin kosong")
+                Text(
+                    text = stringResource(R.string.recycle_bin_empty)
+                )
             }
         } else {
             Column(
@@ -78,13 +92,15 @@ fun RecycleBinScreen(
             ) {
                 Button(
                     onClick = {
-                        viewModel.clearRecycleBin()
+                        showClearDialog = true
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                 ) {
-                    Text(text = "Kosongkan Recycle Bin")
+                    Text(
+                        text = stringResource(R.string.clear_recycle_bin)
+                    )
                 }
 
                 LazyColumn(
@@ -105,6 +121,48 @@ fun RecycleBinScreen(
             }
         }
     }
+
+    if (showClearDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showClearDialog = false
+            },
+            title = {
+                Text(
+                    text = stringResource(R.string.clear_recycle_bin_title)
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.clear_recycle_bin_message)
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showClearDialog = false
+                        viewModel.clearRecycleBin()
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.delete_all),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showClearDialog = false
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.tombol_batal)
+                    )
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -113,6 +171,10 @@ fun DeletedSetoranItem(
     onRestore: () -> Unit,
     onDeletePermanent: () -> Unit
 ) {
+    var showDeleteDialog by remember {
+        mutableStateOf(false)
+    }
+
     Card(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -134,9 +196,28 @@ fun DeletedSetoranItem(
                     style = MaterialTheme.typography.titleMedium
                 )
 
-                Text(text = "Surah: ${deletedSetoran.surah}")
-                Text(text = "Ayat: ${deletedSetoran.ayat}")
-                Text(text = "Catatan: ${deletedSetoran.catatan}")
+                Text(
+                    text = stringResource(
+                        R.string.label_surah,
+                        deletedSetoran.surah
+                    )
+                )
+
+                Text(
+                    text = stringResource(
+                        R.string.label_ayat,
+                        deletedSetoran.ayat
+                    )
+                )
+
+                if (deletedSetoran.catatan.isNotBlank()) {
+                    Text(
+                        text = stringResource(
+                            R.string.label_catatan,
+                            deletedSetoran.catatan
+                        )
+                    )
+                }
             }
 
             IconButton(
@@ -144,18 +225,63 @@ fun DeletedSetoranItem(
             ) {
                 Icon(
                     imageVector = Icons.Default.Restore,
-                    contentDescription = "Undo"
+                    contentDescription = stringResource(R.string.restore)
                 )
             }
 
             IconButton(
-                onClick = onDeletePermanent
+                onClick = {
+                    showDeleteDialog = true
+                }
             ) {
                 Icon(
                     imageVector = Icons.Default.DeleteForever,
-                    contentDescription = "Hapus permanen"
+                    contentDescription = stringResource(R.string.delete_permanent),
+                    tint = MaterialTheme.colorScheme.error
                 )
             }
         }
+    }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showDeleteDialog = false
+            },
+            title = {
+                Text(
+                    text = stringResource(R.string.delete_permanent_title)
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.delete_permanent_message)
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        onDeletePermanent()
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.tombol_hapus),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.tombol_batal)
+                    )
+                }
+            }
+        )
     }
 }

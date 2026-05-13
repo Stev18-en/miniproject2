@@ -8,7 +8,6 @@ import com.stevenmarchy0013.simukmin.model.DeletedSetoran
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 class DetailViewModel(
