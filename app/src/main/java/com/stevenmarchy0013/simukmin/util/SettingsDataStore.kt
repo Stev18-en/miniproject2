@@ -6,6 +6,13 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.map
 
 private val Context.dataStore by preferencesDataStore(
     name = "settings"
@@ -16,21 +23,25 @@ class SettingsDataStore(
 ) {
 
     companion object {
-
-        private val IS_LIST =
-            booleanPreferencesKey("is_list")
+        private val IS_LIST = booleanPreferencesKey("is_list")
+        private val THEME_COLOR = intPreferencesKey("theme_color")
+    }
+    val layoutFlow: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[IS_LIST] ?: true
     }
 
-    val layoutFlow: Flow<Boolean> = context.dataStore.data.map {
-
-        it[IS_LIST] ?: true
+    val themeFlow: Flow<Int> = context.dataStore.data.map { preferences ->
+        preferences[THEME_COLOR] ?: 0
     }
 
     suspend fun saveLayout(isList: Boolean) {
-
-        context.dataStore.edit {
-
-            it[IS_LIST] = isList
+        context.dataStore.edit { preferences ->
+            preferences[IS_LIST] = isList
+        }
+    }
+    suspend fun saveTheme(themeColor: Int) {
+        context.dataStore.edit { preferences ->
+            preferences[THEME_COLOR] = themeColor
         }
     }
 }
