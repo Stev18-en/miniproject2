@@ -5,5 +5,6 @@ sealed class Screen(val route: String) {
     data object Detail : Screen("detailScreen/{id}") {
         fun createRoute(id: Long) = "detailScreen/$id"
     }
+    data object RecycleBin : Screen("recycleBin")
 
 }

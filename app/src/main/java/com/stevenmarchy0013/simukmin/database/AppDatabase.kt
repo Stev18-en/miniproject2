@@ -5,10 +5,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.stevenmarchy0013.simukmin.model.Setoran
-
+import com.stevenmarchy0013.simukmin.model.DeletedSetoran
 @Database(
-    entities = [Setoran::class],
-    version = 1,
+    entities = [
+        Setoran::class,
+        DeletedSetoran::class
+    ],
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -28,7 +31,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "setoran_db"
-                ).build()
+
+                )   .fallbackToDestructiveMigration()
+                    .build()
 
                 INSTANCE = instance
 

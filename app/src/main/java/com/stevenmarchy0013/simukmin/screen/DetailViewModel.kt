@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.stevenmarchy0013.simukmin.database.SetoranDao
 import com.stevenmarchy0013.simukmin.model.Setoran
+import com.stevenmarchy0013.simukmin.model.DeletedSetoran
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -25,7 +26,6 @@ class DetailViewModel(
         catatan: String
     ) {
         val setoran = Setoran(
-            tanggal = formatter.format(Date()),
             namaSiswa = namaSiswa,
             surah = surah,
             ayat = ayat,
@@ -42,15 +42,15 @@ class DetailViewModel(
         namaSiswa: String,
         surah: String,
         ayat: String,
-        catatan: String
+        catatan: String,
     ) {
         val setoran = Setoran(
             id = id,
-            tanggal = formatter.format(Date()),
             namaSiswa = namaSiswa,
             surah = surah,
             ayat = ayat,
-            catatan = catatan
+            catatan = catatan,
+
         )
         viewModelScope.launch(Dispatchers.IO) {
             dao.update(setoran)
@@ -61,11 +61,19 @@ class DetailViewModel(
         return dao.getSetoranById(id)
     }
 
-    fun delete(id: Long) {
+    fun deleteData(setoran: Setoran) {
         viewModelScope.launch(Dispatchers.IO) {
-            dao.getSetoranById(id)?.let {
-                dao.delete(it)
-            }
+
+            val deletedSetoran = DeletedSetoran(
+                originalId = setoran.id,
+                namaSiswa = setoran.namaSiswa,
+                surah = setoran.surah,
+                ayat = setoran.ayat,
+                catatan = setoran.catatan
+            )
+
+            dao.insertDeletedSetoran(deletedSetoran)
+            dao.delete(setoran)
         }
     }
 }

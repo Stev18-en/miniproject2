@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.ViewList
@@ -60,30 +61,23 @@ fun MainScreen(
     navController: NavHostController
 ) {
     Scaffold(
-
         floatingActionButton = {
-
             FloatingActionButton(
-
                 onClick = {
                     navController.navigate(
                         Screen.Detail.createRoute(-1)
                     )
                 },
-
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
-
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = stringResource(R.string.add_setoran)
                 )
             }
         }
-
     ) { innerPadding ->
-
         ScreenContent(
             navController = navController,
             modifier = Modifier.padding(innerPadding)
@@ -97,27 +91,19 @@ fun ScreenContent(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-
     val context = LocalContext.current
-
     val factory = ViewModelFactory(context)
-
-    val viewModel: MainViewModel =
-        viewModel(factory = factory)
+    val viewModel: MainViewModel = viewModel(factory = factory)
 
     val data = viewModel.data.collectAsState()
 
     val dataStore = SettingsDataStore(context)
-
-    val isList = dataStore.layoutFlow.collectAsState(
-        initial = true
-    )
+    val isList = dataStore.layoutFlow.collectAsState(initial = true)
 
     val scope = rememberCoroutineScope()
     var showThemeDialog by remember { mutableStateOf(false) }
 
     Scaffold(
-
         topBar = {
             TopAppBar(
                 title = {
@@ -155,11 +141,23 @@ fun ScreenContent(
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
-                },
 
+                    IconButton(
+                        onClick = {
+                            navController.navigate(Screen.RecycleBin.route)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Recycle Bin",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         }
@@ -184,15 +182,16 @@ fun ScreenContent(
                         .padding(padding)
                         .fillMaxSize()
                 ) {
-                    items(data.value) {
+                    items(data.value) { item ->
                         ListItem(
-                            setoran = it,
+                            setoran = item,
                             onClick = {
                                 navController.navigate(
-                                    Screen.Detail.createRoute(it.id)
+                                    Screen.Detail.createRoute(item.id)
                                 )
                             }
                         )
+
                         HorizontalDivider()
                     }
                 }
@@ -203,12 +202,12 @@ fun ScreenContent(
                         .padding(padding)
                         .fillMaxSize()
                 ) {
-                    items(data.value) {
+                    items(data.value) { item ->
                         GridItem(
-                            setoran = it,
+                            setoran = item,
                             onClick = {
                                 navController.navigate(
-                                    Screen.Detail.createRoute(it.id)
+                                    Screen.Detail.createRoute(item.id)
                                 )
                             }
                         )
@@ -217,6 +216,7 @@ fun ScreenContent(
             }
         }
     }
+
     if (showThemeDialog) {
         AlertDialog(
             onDismissRequest = {
@@ -259,6 +259,7 @@ fun ScreenContent(
                     ) {
                         Text("Ungu")
                     }
+
                     TextButton(
                         onClick = {
                             scope.launch {
@@ -281,9 +282,7 @@ fun ListItem(
     setoran: Setoran,
     onClick: () -> Unit
 ) {
-
     Column(
-
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
@@ -291,15 +290,14 @@ fun ListItem(
 
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-
         Text(
             text = setoran.namaSiswa,
-
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
+
         Text(
             text = stringResource(
                 R.string.label_surah,
@@ -317,16 +315,14 @@ fun ListItem(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-        Text(
-            text = setoran.catatan,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
-        )
 
-        Text(
-            text = setoran.tanggal,
-            style = MaterialTheme.typography.bodySmall
-        )
+        if (setoran.catatan.isNotBlank()) {
+            Text(
+                text = setoran.catatan,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }
 
@@ -335,29 +331,19 @@ fun GridItem(
     setoran: Setoran,
     onClick: () -> Unit
 ) {
-
     Card(
-
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
             .clickable { onClick() }
-
     ) {
-
         Column(
-
             modifier = Modifier.padding(16.dp),
-
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-
             Text(
-
                 text = setoran.namaSiswa,
-
                 fontWeight = FontWeight.Bold,
-
                 style = MaterialTheme.typography.titleMedium
             )
 
@@ -375,15 +361,11 @@ fun GridItem(
                 )
             )
 
-            Text(
-                text = setoran.catatan
-            )
-
-            Text(
-                text = setoran.tanggal,
-
-                style = MaterialTheme.typography.bodySmall
-            )
+            if (setoran.catatan.isNotBlank()) {
+                Text(
+                    text = setoran.catatan
+                )
+            }
         }
     }
 }
@@ -391,9 +373,7 @@ fun GridItem(
 @Preview(showBackground = true)
 @Composable
 fun MainScreenPreview() {
-
     SiMukminTheme {
-
         MainScreen(
             navController = rememberNavController()
         )
